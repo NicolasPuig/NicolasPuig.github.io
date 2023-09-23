@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>Data Cleansing</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" />
+	</noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Header -->
+		<header id="header">
+			<h1>Data Cleansing</h1>
+			<p>Basic Concepts of Data Preprocessing</p>
+		</header>
+
+		<!-- Main -->
+		<div id="main">
+
+			<!-- Content -->
+			<section id="content" class="main">
+				<span class="image main"><img src="images/data_cleaning_0.jpg" alt="" /></span>
+				<h2>Introduction</h2>
+				<p>
+					Data cleaning is the first step of data preprocessing, it consists in fixing or removing invalid and
+					unwanted values in our dataset.
+					Some common examples are:
+				<ul>
+					<li>Duplicates</li>
+					<li>Outliers</li>
+					<li>Missing values</li>
+					<li>Invalid formats</li>
+					<li>Corrupted data</li>
+				</ul>
+
+				In the following example we will be using <a href="https://rapidminer.com/">RapidMiner Studio</a>
+				to easily clean our data, and the <a href="https://www.kaggle.com/c/titanic/data">Titanic example
+					dataset</a>. Our goal is to predict if a passenger survived the sinking of the Titanic or not.
+				</p>
+
+				<!-- Body -->
+				<h2>1. Analysing the dataset</h2>
+				<p>
+					First of all, what data do we have? Lets see what variables are present. This can be done importing
+					the dataset into RapidMiner, adding the <b>Retrieve</b> operator, and connecting it to the output.
+				</p>
+				<div class="col-1"><span class="image main"><img src="images/data_cleaning_1.png" alt="" /></span></div>
+				<p>
+					We have 1309 registers and 12 variables, where the target is '<i>Survived</i>'. At first glance we already see some
+					problematic data, for example the amount of missing values.
+
+					// TODO Hablar de eliminar las variables inecesarias antes de los missing values
+				</p>
+
+
+				<h2>2. Handling missing values</h2>
+				<p>
+					Some ML models, like Linear and Logistic Regression, do not support variables with missing values. 
+					In order to use them, this problem must be solved, and can be done using the following techniques:
+					<ol>
+						<li>Impute artificial values</li>
+						<li>Removing variables with high amount of missing values</li>
+					</ol>
+
+
+				<div class="col-1"><span class="image main"><img src="images/" alt="" /></span></div>
+
+
+				</p>
+			</section>
+
+		</div>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<section>
+				<h2>Aliquam sed mauris</h2>
+				<p>Sed lorem ipsum dolor sit amet et nullam consequat feugiat consequat magna adipiscing tempus etiam
+					dolore veroeros. eget dapibus mauris. Cras aliquet, nisl ut viverra sollicitudin, ligula erat
+					egestas velit, vitae tincidunt odio.</p>
+				<ul class="actions">
+					<li><a href="#" class="button">Learn More</a></li>
+				</ul>
+			</section>
+			<section>
+				<h2>Etiam feugiat</h2>
+				<dl class="alt">
+					<dt>Address</dt>
+					<dd>1234 Somewhere Road &bull; Nashville, TN 00000 &bull; USA</dd>
+					<dt>Phone</dt>
+					<dd>(000) 000-0000 x 0000</dd>
+					<dt>Email</dt>
+					<dd><a href="#">information@untitled.tld</a></dd>
+				</dl>
+				<ul class="icons">
+					<li><a href="#" class="icon brands fa-twitter alt"><span class="label">Twitter</span></a></li>
+					<li><a href="#" class="icon brands fa-facebook-f alt"><span class="label">Facebook</span></a></li>
+					<li><a href="#" class="icon brands fa-instagram alt"><span class="label">Instagram</span></a></li>
+					<li><a href="#" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+					<li><a href="#" class="icon brands fa-dribbble alt"><span class="label">Dribbble</span></a></li>
+				</ul>
+			</section>
+			<p class="copyright">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+		</footer>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
