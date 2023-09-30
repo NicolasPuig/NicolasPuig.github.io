@@ -32,11 +32,11 @@
 
 			<!-- Content -->
 			<section id="content" class="main">
-				<span class="image main"><img src="images/data_cleaning_0.jpg" alt="" /></span>
+				<span class="image main"><img src="images/data_cleansing/0.jpg" alt="" /></span>
 				<h2>Introduction</h2>
 				<p>
 					Data cleaning is the first step of data preprocessing, it consists in fixing or removing invalid and
-					unwanted values in our dataset.
+					unwanted values from our dataset.
 					Some common examples are:
 				<ul>
 					<li>Duplicates</li>
@@ -52,37 +52,108 @@
 				</p>
 
 				<!-- Body -->
-				<h2>1. Analysing the dataset</h2>
+				<h2>1. Dataset Analysis</h2>
 				<p>
 					First of all, what data do we have? Lets see what variables are present. This can be done importing
 					the dataset into RapidMiner, adding the <b>Retrieve</b> operator, and connecting it to the output.
 				</p>
-				<div class="col-1"><span class="image main"><img src="images/data_cleaning_1.png" alt="" /></span></div>
+				<div class="row aln-center">
+					<div class="col-11">
+						<span class="image main"><img src="images/data_cleansing/1.png" alt="" /></span>
+					</div>
+				</div>
 				<p>
-					We have 1309 registers and 12 variables, where the target is '<i>Survived</i>'. At first glance we already see some
-					problematic data, for example the amount of missing values.
-
-					// TODO Hablar de eliminar las variables inecesarias antes de los missing values
+					We have 1309 registers and 12 variables, where the target is <i>Survived</i>. At first glance we
+					already see some problematic data, for example the amount of missing values.
 				</p>
+
 
 
 				<h2>2. Handling missing values</h2>
 				<p>
-					Some ML models, like Linear and Logistic Regression, do not support variables with missing values. 
-					In order to use them, this problem must be solved, and can be done using the following techniques:
-					<ol>
-						<li>Impute artificial values</li>
-						<li>Removing variables with high amount of missing values</li>
-					</ol>
-
-
-				<div class="col-1"><span class="image main"><img src="images/" alt="" /></span></div>
-
-
+					Some ML models, like Linear and Logistic Regression, do not support variables with missing values.
+					In order to use them, this problem must be solved, and can be done with the following techniques:
 				</p>
-			</section>
+				<h4><strong>2.1 Removing missing values</strong></h4>
+				<p>
+					If a variable has few missing values consider <b>deleting each of this rows</b>, only if the dataset
+					is big enough and you are sure that fewer examples will not be a problem.
+					On the other hand, if more than 50% of a variable is missing, the best option to consider is
+					<b>droping the entire column</b>.
+				</p>
+				<p>
+					For instance, more than half of the variables <i>Cabin</i> and <i>Life Boat</i> have missing
+					values, so let's just remove them. Also, let's remove the 3 rows that have missing <i>Port of
+						Embarkation</i> and <i>Passenger Fare</i>. In RapidMiner, add <strong>Select
+						Attributes</strong> operator to include only selected variables, and <strong>Filter
+						Examples</strong>
+					operator to filter rows matching the given condition.
+				</p>
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-8">
+							<span class="image fit"><img src="images/data_cleansing/4.png" alt="" /></span>
+						</div>
+						<div class="col-5">
+							<span class="image fit"><img src="images/data_cleansing/2.png" alt="" /></span>
+						</div>
+						<div class="col-7">
+							<span class="image fit"><img src="images/data_cleansing/3.png" alt="" /></span>
+						</div>
+					</div>
+				</div>
 
+
+				<h4><strong>2.2 Impute artificial data</strong></h4>
+				<p>
+					What about <i>Age</i>? Deleting 1/5 of the dataset (263 examples) may not be the best solution.
+					Instead, we can impute numerical missing values with the mean of the variable. Although it's not a
+					real value, it's an easy and useful fix for this case.
+				</p>
+				<p>
+					Add the <b>Replace Missing Values</b> operator and configure it in the following way:
+				</p>
+				<div class="box alt">
+					<div class="row aln-center aln-middle">
+						<div class="col-7">
+							<span class="image fit"><img src="images/data_cleansing/5.png" alt="" /></span>
+						</div>
+						<div class="col-4">
+							<span class="image fit"><img src="images/data_cleansing/6.png" alt="" /></span>
+						</div>
+					</div>
+				</div>
+				<p>
+					The variable distribution stays the same using the mean as value replacement.
+					However, depending on the problem you can use other replacement values such as max, min, median or
+					many others.
+				</p>
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-4">
+							<div class="row aln-center">
+								<span class="image fit"><img src="images/data_cleansing/7.png" alt="" /></span>
+								<p><i>Age</i> original distribution</p>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="row aln-center">
+								<span class="image fit"><img src="images/data_cleansing/8.png" alt="" /></span>
+								<p><i>Age</i> distribution after imputing with mean</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<h2>3. </h2>
+
+
+
+				<h2>4. </h2>
+			</section>
 		</div>
+		
 
 		<!-- Footer -->
 		<footer id="footer">
