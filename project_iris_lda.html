@@ -1,0 +1,275 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>Project LDA</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" />
+	</noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Header -->
+		<header id="header">
+			<h1>Linear Discriminant Analysis</h1>
+			<p>Case of study</p>
+		</header>
+
+		<!-- Main -->
+		<div id="main">
+
+			<!-- Content -->
+			<section id="content" class="main">
+				<span class="image main"><img src="images/project_lda/0.jpg" alt="" /></span>
+				<h2>Introduction</h2>
+				<p>
+					Linear Discriminant Analysis (LDA) is a statistical tool used as a linear classification algorithm.
+					In constrast to logistic regression, it allows <strong>multiclass classification</strong>.
+					It tries to find the linear combination of attributes which best separate each group, called
+					discriminants.
+					</br>
+					We are using this method for solving the following problem using Python: Wine classification based
+					on chemical composition.
+				</p>
+
+				<h3>Base Libraries</h3>
+				<p>The following useful python libraries will be needed for plotting and processing data:</p>
+				<pre><code>import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns</code></pre>
+
+
+
+
+				<!-- Body -->
+				<h2>1. The Dataset</h2>
+				<p>
+					<i>Wine</i> is a common dataset that can be found in the
+					<a href="https://archive.ics.uci.edu/dataset/109/wine">UCI Machine Learning Repository</a>.
+					Let's load it in our Python Notebook:
+				<pre><code>from ucimlrepo import fetch_ucirepo 
+wine = fetch_ucirepo(id=109) 
+X = wine.data.features 
+y = wine.data.targets
+
+print(wine.variables)</code></pre>
+				The dataset contains 178 examples with 13 numerical features about wine's chemical composition,
+				and the target is the categorical variable <i>class</i> with 3 different values.
+				</p>
+
+				<div class="row aln-center">
+					<div class="col-9">
+						<span class="image main"><img src="images/project_lda/1.png" alt="" /></span>
+					</div>
+				</div>
+
+
+				<h4><b>Train and Test Split</b></h4>
+				<p>
+					To perform a correct testing, let's split 80% of the dataset for training (142 samples), and the
+					remaing 20% for testing (36 samples).
+				</p>
+
+				<pre><code>from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=10)</code></pre>
+
+				<h2>2. Preparing Data For LDA</h2>
+
+				<h4><b>Missing Values</b></h4>
+				<p>
+					Using the Pandas function <code>X.info()</code> we can confirm that there are no missing values on
+					the dataset.
+				</p>
+
+
+
+				<h4><b>Feature Distribution</b></h4>
+				<p>
+					LDA assumes that each variable have a <b>Gaussian distribution</b>. When examining each one, we can
+					observe that the majority of distributions are correct, although some are skewed.
+				</p>
+				<pre><code>X_train.hist(layout=(5,5), figsize=(10,10), ec="k", grid=False)
+plt.tight_layout()
+plt.show()</code></pre>
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-12">
+							<span class="image fit"><img src="images/project_lda/2.png" alt="" /></span>
+						</div>
+					</div>
+				</div>
+				<p>
+					<b>Box-Cox Transformation</b> is a good solution to correct the skewness for each variable,
+					adjusting the <i>Lambda</i> parameter depending on each distribution type. Although it will not be
+					applyied in this case to simplify the process,
+					it can be done in the following way:
+				</p>
+				<pre><code>from scipy.stats import boxcox
+
+color_intensity = X_train['Color_intensity']
+corrected_color_intensity = boxcox(color_intensity, lmbda=0.2)</code></pre>
+
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-10">
+							<span class="image fit"><img src="images/project_lda/3.png" alt="" /></span>
+						</div>
+					</div>
+				</div>
+
+
+				<h4><b>Normalization</b></h4>
+				<p>
+					Additionally, each variable should have the same variance, so we should standarize it to
+					obtain a mean equal to 0, and a standard deviation of 1.
+				</p>
+				<pre><code>from sklearn.preprocessing import StandardScaler
+
+scaled_data = StandardScaler().fit_transform(X_train)
+X_train = pd.DataFrame(scaled_data, columns=X_train.columns)
+</code></pre>
+
+
+
+				<h2>3. Training LDA model for Classification</h2>
+				<p>
+					It's time to train our classifier with the prepared data. Because LDA is a feature reduction method,
+					the result will be <code>N - 1</code> linear discriminant features, where N is the amount of output
+					classes.
+					In this case, the result will be 2 discriminants.
+				</p>
+				<pre><code>from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+lda = LinearDiscriminantAnalysis()
+X_lda = lda.fit_transform(X_train, y_train['class'])
+
+plt.figure(figsize=(6, 5))
+sns.scatterplot(x=X_lda[:, 0], y=X_lda[:, 1], hue=y_train['class'], palette='Set1')
+plt.title('LDA Projection of Data')
+plt.xlabel('LDA Discriminant 1')
+plt.ylabel('LDA Discriminant 2')
+plt.show()</code></pre>
+
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-9">
+							<span class="image fit"><img src="images/project_lda/4.png" alt="" /></span>
+						</div>
+						<p>
+							Resulting projection of the data based on the 2 best linear combination of features found
+							(discriminants).
+							</br>
+							There is a clear separation of each cluster of samples.
+						</p>
+					</div>
+				</div>
+
+
+
+				<h2>4. Testing and Performance</h2>
+				<p>
+					Once the classifier is trained, let's make predictions on new data using the remaining test dataset
+					to evaluate its performance.
+				</p>
+				<pre><code>from sklearn.metrics import classification_report
+
+y_pred = lda.predict(standarize(X_test))
+print(classification_report(y_test, y_pred))</code></pre>
+
+
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-8">
+							<div class="row aln-center">
+								<span class="image fit"><img src="images/project_lda/5.png" alt="" /></span>
+							</div>
+						</div>
+						<p>
+							This classification reports show that the model has very good performance on unseen data,
+							with <strong>94% of accuracy</strong>.
+						</p>
+					</div>
+				</div>
+
+				<h4><b>Confusion Matrix</b></h4>
+				<p>
+					We can analyze the predictions made with a confusion matrix to compare them with the actual results.
+				</p>
+				<pre><code>from sklearn.metrics import confusion_matrix
+
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt="d", cmap="Greens", cbar=False,
+			xticklabels=y_classes, yticklabels=y_classes)
+
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.show()</code></pre>
+
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-8">
+							<div class="row aln-center">
+								<span class="image fit"><img src="images/project_lda/6.png" alt="" /></span>
+							</div>
+						</div>
+						<p>Out of 36 predictions, only 2 mistakes where made. The model classified as Class 3, but was
+							Class 2.</p>
+					</div>
+				</div>
+
+
+				<h2>5. Conclusion</h2>
+				<p>
+					The classifier results where really good, achieving high accuracy of 94% on predictions made to new
+					data.
+					</br>
+					Although, results could be even better applying Box-Cox transformation for each feature with
+					skewed distribution.
+				</p>
+				<p>
+					The complete <a href="">Python Notebook can be found here</a>, which has few more details about the code
+					used.
+				</p>
+
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-8">
+							<a href="index.html" class="button primary fit">Home</a>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+
+		<!-- Footer -->
+		<footer id="footer">
+			<p class="copyright">&copy; My Machine Learning Portfolio. By Nicolás Puig</p>
+		</footer>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
