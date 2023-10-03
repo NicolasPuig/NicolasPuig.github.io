@@ -23,7 +23,7 @@
 
 		<!-- Header -->
 		<header id="header">
-			<h1>Linear Discriminant Analysis</h1>
+			<h1>Linear Discriminant Analysis for Classification</h1>
 			<p>Case of study</p>
 		</header>
 
@@ -66,7 +66,7 @@ y = wine.data.targets
 
 print(wine.variables)</code></pre>
 				The dataset contains 178 examples with 13 numerical features about wine's chemical composition,
-				and the target is the categorical variable <i>class</i> with 3 different values.
+				and the target is the categorical variable <i>class</i> with 3 different values: Class 1, 2 or 3.
 				</p>
 
 				<div class="row aln-center">
@@ -86,13 +86,22 @@ print(wine.variables)</code></pre>
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=10)</code></pre>
 
 				<h2>2. Preparing Data For LDA</h2>
+				<p>
+					To achieve a robust model, we must prepare data to meet the standards expected by the LDA algorithm.
+					In summary, data must:
+				<ul>
+					<li>Have no missing values</li>
+					<li>Have gaussian distributions</li>
+					<li>Be standarized</li>
+				</ul>
+				</p>
+
 
 				<h4><b>Missing Values</b></h4>
 				<p>
 					Using the Pandas function <code>X.info()</code> we can confirm that there are no missing values on
 					the dataset.
 				</p>
-
 
 
 				<h4><b>Feature Distribution</b></h4>
@@ -112,9 +121,8 @@ plt.show()</code></pre>
 				</div>
 				<p>
 					<b>Box-Cox Transformation</b> is a good solution to correct the skewness for each variable,
-					adjusting the <i>Lambda</i> parameter depending on each distribution type. Although it will not be
-					applyied in this case to simplify the process,
-					it can be done in the following way:
+					adjusting the <i>Lambda</i> parameter depending on each distribution type. Although, it will not be
+					applyied in this case to simplify the process, but it can be done in the following way:
 				</p>
 				<pre><code>from scipy.stats import boxcox
 
@@ -132,7 +140,7 @@ corrected_color_intensity = boxcox(color_intensity, lmbda=0.2)</code></pre>
 
 				<h4><b>Normalization</b></h4>
 				<p>
-					Additionally, each variable should have the same variance, so we should standarize it to
+					Each variable should have the same variance, so we should standarize it to
 					obtain a mean equal to 0, and a standard deviation of 1.
 				</p>
 				<pre><code>from sklearn.preprocessing import StandardScaler
@@ -232,15 +240,15 @@ plt.show()</code></pre>
 
 				<h2>5. Conclusion</h2>
 				<p>
-					The classifier results where really good, achieving high accuracy of 94% on predictions made to new
-					data.
-					</br>
-					Although, results could be even better applying Box-Cox transformation for each feature with
-					skewed distribution.
+					The classifier results were really good, achieving a high accuracy of 94% on predictions made for
+					new data.
+					However, the results could be further improved by applying the Box-Cox transformation to each
+					feature with a skewed distribution.
 				</p>
 				<p>
-					The complete <a href="">Python Notebook can be found here</a>, which has few more details about the code
-					used.
+					You can find the
+					<a href="downloadable/LDA_for_Wine_Classification.ipynb">complete Python Notebook here</a>,
+					which provides more details about the code used.
 				</p>
 
 				<div class="box alt">
