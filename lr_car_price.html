@@ -1,0 +1,330 @@
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>Project LDA</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" />
+	</noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Header -->
+		<header id="header">
+			<h1>Car Price Prediction Using Linear Regression</h1>
+			<p>Case of study</p>
+		</header>
+
+		<!-- Main -->
+		<div id="main">
+
+			<!-- Content -->
+			<section id="content" class="main">
+				<span class="image main"><img src="images/project_lr_cars/0.jpeg" alt="" /></span>
+				<h2>Introduction</h2>
+				<p>
+					Linear Regression is a statistical technique that models the relationship between a dependent
+					variable and a group of independent variables by finding a linear equation that fits the data.
+					It is commonly used in machine learning for making predictions, aiming to minimize the distance
+					between the predicted and actual values.
+				</p>
+				<p>
+					In the following example we will be predicting car prices based on it's caracteristics,
+					exploring which features are significant to the price and applying feature selection
+					to obtain the optimal amount of features.
+				</p>
+
+				<h3>Base Libraries</h3>
+				<p>The following useful python libraries will be needed for plotting and processing data:</p>
+				<pre><code>import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np</code></pre>
+
+
+
+
+				<!-- Body -->
+				<h2>1. The Dataset</h2>
+				<p>
+					The car prices dataset can be found in
+					<a href="https://www.kaggle.com/datasets/hellbuoy/car-price-prediction">Kaggle</a>.
+					It contains data about the American's cars market and pricing.
+					Let's load the csv file into our Python Notebook:
+				<pre><code>df = pd.read_csv("CarPrice_Assignment.csv")
+print(df.info())</code></pre>
+
+				It contains 205 examples with 25 features (15 numerical and 10 categorical)
+				about the cars caracteristics, and the target is the <i>price</i> of the car in USD dollars.
+				</p>
+
+
+				<h2>2. Data Preprocessing</h2>
+				<p>
+					The dataset contains no missing values, but there are categorical features that must be encoded
+					properly to be used in the linear regression model.
+				</p>
+
+
+				<h3><b>2.1 Categorical Features</b></h3>
+				<p>
+					Let's take a look at the possible values of each feature:
+				</p>
+				<pre><code>cat_features = df.select_dtypes(include=['object'])
+print(cat_features.apply(lambda feature: feature.unique()))</code></pre>
+
+				<div class="row aln-center">
+					<div class="col-10">
+						<div class="row aln-center">
+							<span class="image fit"><img src="images/project_lr_cars/1.png" alt="" /></span>
+						</div>
+					</div>
+				</div>
+
+				<p>
+					Taking a deeper look to <i>CarName</i>, looks like it's the combination of the brand
+					and model. We will only keep the brand because there are too many models, and probably
+					will not provide much information.
+				</p>
+				<pre><code>df['brand'] = df.CarName.apply(lambda x: x.split(" ")[0])
+df = df.drop(columns=["CarName"])
+print("Brands:", np.sort(df.brand.unique()))</code></pre>
+
+				<div class="row aln-center">
+					<div class="col-10">
+						<div class="row aln-center">
+							<span class="image fit"><img src="images/project_lr_cars/2.png" alt="" /></span>
+						</div>
+					</div>
+					<p>Wait a minute... <i>toyouta</i>?</p>
+				</div>
+
+
+				<p>
+					Unfortunately there are some typos that must be fixed:
+				</p>
+				<pre><code>df = (df.replace("Nissan", "nissan")
+	.replace("vokswagen", "volkswagen").replace("vw", "volkswagen")
+	.replace("toyouta", "toyota").replace("maxda", "mazda")
+	.replace("porcshce", "porsche").replace("alfa-romero", "alfa-romeo"))</code></pre>
+
+				<h4><b>Encoding</b></h4>
+				<p>
+					Categorical variables must be encoded to a numerical value for linear regression.
+					For example using label encoding, one-hot encoding, count encoding or many others.
+					</br>
+					Best results where achieved using label encoding for features with few values, and
+					one-hot encoding for the rest.
+				</p>
+
+				<div class="row aln-center">
+					<div class="col-4">
+						<div class="row aln-center">
+							<span class="image fit"><img src="images/project_lr_cars/3.png" alt="" /></span>
+						</div>
+					</div>
+					<div class="col-7">
+						<div class="row aln-center">
+							<span class="image fit"><img src="images/project_lr_cars/4.png" alt="" /></span>
+						</div>
+					</div>
+				</div>
+
+				<pre><code># Label Encoding
+label_encoding = ['aspiration','enginelocation','doornumber','fueltype','drivewheel']
+df[label_encoding] = df[label_encoding].apply(lambda x: pd.factorize(x)[0])
+
+# One-hot encoding
+df = pd.get_dummies(df)</code></pre>
+
+
+
+				<h2>3. Feature Selection</h2>
+				<p>
+					First, let's drop the unrelated feature <i>Car_ID</i>.
+				</p>
+				<pre><code>df = df.drop(columns=["car_ID"])</code></pre>
+				<p>
+					Next, we will use a simple but useful approach for feature selection, taking the top best features
+					<b> based on their correlation with the target variable</b>. We can obtain the top and worst 10
+					features with the following code:
+				</p>
+				<pre><code>X = df.drop(columns=['price'])
+y = df.price
+X_by_corr = X.corrwith(y).abs().sort_values(ascending=False)</code></pre>
+
+				<div class="row">
+					<div class="col-6 col-12-medium">
+						<h4><b>Top 10 Features</b></h4>
+						<ol>
+							<li>enginesize: 0.874</li>
+							<li>curbweight: 0.835</li>
+							<li>horsepower: 0.808</li>
+							<li>carwidth: 0.759</li>
+							<li>cylindernumber_four: 0.698</li>
+							<li>highwaympg: 0.698</li>
+							<li>citympg: 0.686</li>
+							<li>carlength: 0.683</li>
+							<li>drivewheel: 0.578</li>
+							<li>wheelbase: 0.578</li>
+						</ol>
+					</div>
+					<div class="col-6 col-12-medium">
+						<h4><b>Worst 10 Features</b></h4>
+						<ol>
+							<li>fuelsystem_mfi: 0.003</li>
+							<li>cylindernumber_two: 0.005</li>
+							<li>enginetype_rotor: 0.005</li>
+							<li>enginetype_ohcf: 0.016</li>
+							<li>fuelsystem_4bbl: 0.017</li>
+							<li>fuelsystem_spfi: 0.020</li>
+							<li>brand_mercury: 0.028</li>
+							<li>doornumber: 0.032</li>
+							<li>brand_alfa-romeo: 0.034</li>
+							<li>enginetype_l: 0.042</li>
+						</ol>
+					</div>
+				</div>
+				<p>
+					The correlation can be better visualized in scatter plots.
+					For instance, with the following graphs we can conclude that:
+				</p>
+				<ul>
+					<li>The vehicle's curb weight and engine size directly affects the price</li>
+					<li>Cars with four cylinders have low prices</li>
+					<li>Higher MPG (Miles Per Gallon) means lower prices</li>
+				</ul>
+				<div class="row aln-center">
+					<span class="image fit"><img src="images/project_lr_cars/5.png" alt="" /></span>
+				</div>
+
+
+
+				<h3>3.1 Finding optimal number of features</h3>
+				<p>
+					To identify the top best features, we will apply cross-validation with 10 folds, using the N most
+					highly correlated variables as the training set for a Linear Regression model.
+					Starting only with the best feature and subsequently
+					incorporating the next best from the list until we have included all of them.
+					</br>
+					We will use R<sup>2</sup> and Root Mean Squared Error (RMSE) to evaluate the model performance.
+				</p>
+				<pre><code>from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_validate, KFold
+
+def apply_cross_validation(X, y, kfolds=10):
+  model = LinearRegression()
+  kf = KFold(n_splits=kfolds, shuffle=True, random_state=42)
+  scores = ['r2', 'neg_root_mean_squared_error']
+  results = cross_validate(model, X, y, cv=kf, scoring=scores)
+  return np.mean(results['test_r2']), -np.mean(results['test_neg_root_mean_squared_error'])
+
+results = {"i": [], "rmse":[], "r2":[]}
+for i in range(2, len(X_by_corr)):
+  new_X = X[X_by_corr.index[:i]]
+  r2, rmse = apply_cross_validation(new_X, y)
+  results["i"].append(i)
+  results["rmse"].append(rmse)
+  results["r2"].append(r2)
+
+results = pd.DataFrame(results)</code></pre>
+
+
+				<div class="row aln-center">
+					<span class="image fit"><img src="images/project_lr_cars/6.png" alt="" /></span>
+				</div>
+				<p>
+					As a result, the optimal number of features is the <b>top 48</b>, with
+					<code>R<sup>2</sup>=0.918</code> and <code>RMSE=2118.16</code>.
+					This a good result, so let's filter our final training set:
+				</p>
+				<pre><code>best = results[results.rmse == results.rmse.min()]
+X = X[X_by_corr.index[:best.i.iloc[0]]]</code></pre>
+
+
+
+
+
+				<h2>4. Train and Test</h2>
+				<p>
+					Finally, we will split our dataset 80% for training (164 examples) and 20% for testing (41
+					examples).
+				</p>
+				<pre><code>from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+</code></pre>
+
+				<p>
+					Then, train a Linear Regression model and obtain it's resulting scores.
+				</p>
+				<pre><code>from sklearn.metrics import r2_score, mean_squared_error
+# Train
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Test
+y_pred = model.predict(X_test)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)
+print(f"Test result: RMSE={rmse:.2f}, R2_Score={r2:.3f}")</code></pre>
+				<p>
+					As a result, the model achieved <code>R<sup>2</sup>=0.920</code> and <code>RMSE=2515.90</code>.
+					This means that it had a good performance and accurate predictions, although it could be better.
+				</p>
+				<div class="row aln-center">
+					<span class="image fit"><img src="images/project_lr_cars/7.png" alt="" /></span>
+				</div>
+
+				<p>
+					You can find the
+					<a href="downloadable/Car_Price_Prediction_Linear_Regression.ipynb">complete Python Notebook
+						here</a>,
+					which provides more details about the code used. Remember to
+					<a href="https://www.kaggle.com/datasets/hellbuoy/car-price-prediction/code">download the dataset
+						csv file from Kaggle.</a>
+
+				</p>
+
+				<div class="box alt">
+					<div class="row aln-center">
+						<div class="col-8">
+							<a href="index.html" class="button primary fit">Home</a>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+
+		<!-- Footer -->
+		<footer id="footer">
+			<p class="copyright">&copy; My Machine Learning Portfolio. By Nicolás Puig</p>
+		</footer>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
